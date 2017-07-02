@@ -25,6 +25,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 
+app.disable('x-powered-by');//hide framework name
+app.set('case sensitive routing',true);//enable case sensitive in links
+app.set('strict routing', true);
+app.enable('view cache');
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
@@ -37,15 +42,13 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
+   res.setHeader('Content-Type', 'application/json');
   // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
 
-//case sensitive routing
-app.set('strict routing',true);
-app.set('view cache',true);
+
 app.listen(8080);
 
 
