@@ -4,9 +4,14 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var csrf=require('csurf');
+var expressSession=require('express-session');
+var validator=require('express-validator');
+
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var newsletter=require('./routes/newsletter');
 
 var app = express();
 
@@ -18,12 +23,26 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(validator());
 app.use(cookieParser());
+app.use(expressSession({secret: 'ABC', resave: true, saveUninitialized: true}));
+
+app.use(csrf());
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+//csrf token
+app.use(function(req,res,next){
+  console.log("end............");
+  res.locals.csrftoken=req.csrfToken();
+  next();
+});
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/newsletter',newsletter);
+
 
 app.disable('x-powered-by');//hide framework name
 app.set('case sensitive routing',true);//enable case sensitive in links
@@ -37,6 +56,8 @@ app.use(function(req, res, next) {
   next(err);
 });
 
+
+
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
@@ -47,6 +68,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 
 
 app.listen(8080);

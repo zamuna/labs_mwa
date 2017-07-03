@@ -1,0 +1,8 @@
+extends layout
+block content
+    h1=title
+        form(name='form' method='post' action='/newsletter' )
+          input(type="text", placeholder="Your Email" name="email")
+          input(type="hidden" name="_csrf" value="#{csrftoken}")
+          hr
+          input(type="submit" value="Subscribe")
